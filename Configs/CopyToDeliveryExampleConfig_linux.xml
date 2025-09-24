@@ -1,0 +1,79 @@
+<MainNode name="whatever">
+  <Drive>/home</Drive>
+  <DeliveryPath>/Delivery</DeliveryPath>
+  <DeliveryPathSubDirs>
+    <DirItem name="/SubExampleA"/>
+    <DirItem name="/SubExampleB"/>
+  </DeliveryPathSubDirs>
+  <PathToZip>/usr/local/7zip/.7zz</PathToZip>
+  <PathToTemp>~/temp/_unzip/</PathToTemp>
+  <DeleteIfExist>yes</DeleteIfExist>
+  <CreateIfNotExist>yes</CreateIfNotExist>
+  <ConditionsForContinue>
+    <ConditionItem path="\CopyToDeliveryExampleSource\exampledata.txt" />
+  </ConditionsForContinue>
+  <ReadReplaceConst>
+    <ConstItem path="\CopyToDeliveryExampleSource\exampledata.txt" xml_const="#VARIANT_NUMBER" regex="#\s+var_number\s+(_[\w,]+)"/>  -->
+  </ReadReplaceConst>
+  <ReplaceConst>
+    <ConstItem xml_const="#VARIANT_LETTER" value="Variant_A"/>
+  </ReplaceConst>
+
+ <BuildOutput path="/CopyToDeliveryExampleSource"/>
+
+ <CopySet>
+   <!-- Template of copy cases -->
+   <!-- Known attributes: -->
+     <!-- path="BuildOutput" -->
+     <!-- path="full" -->
+     <!-- file="rename" -->
+
+   <!-- ************ Copy 2 specific file from BuildOutput path -->
+   <Where name="/SubExampleA">
+     <Item what="/a.txt"                                                              path="BuildOutput"/> -->
+     <Item what="/subb/b.txt"                                                         path="BuildOutput"/> -->
+   </Where>
+
+   <!-- ************ Copy 1 specific file from specific path -->
+   <Where name="\SubExampleB">
+     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\b.txt"     path="full"/>
+   </Where>
+
+   <!-- ************ Copy 1 specific file from specific path into root target folder-->
+   <Where name="\">
+    <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\c.txt"      path="full"/>
+   </Where>
+   <Where name="\">
+    <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\#VARIANT_NUMBER\c.txt"      path="full"/>
+   </Where>
+
+   <!-- ************ Copy folder with content -->
+   <Where name="\">
+     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\subc\*"    path="full"/>
+   </Where>
+
+   <!-- ************ Copy multiple files -->
+   <Where name="\SubExampleA">
+     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\suba\*.xml"        path="full"/>
+   </Where>
+
+   <!-- ************ Copy and rename one specific file -->
+   <Where name="\SubExampleA\a_renamed_#VARIANT_LETTER.txt">
+     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\c.txt"            file="rename"/>
+   </Where>
+
+   <!-- ************ Copy 1 specific file from zip file -->
+   <Where name="\">
+     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\CopyToDeliveryExampleSource.zip\subx\subx.txt"     path="full"/>
+   </Where>
+
+   <!-- ************ Copy folder from zip file -->
+   <Where name="\">
+     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\CopyToDeliveryExampleSource.zip\subz\*"     path="full"/>
+   </Where>
+
+ </CopySet>
+</MainNode>
+
+
+
