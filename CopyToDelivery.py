@@ -10,6 +10,7 @@
 #  Version  Date      Author  Comment                                                      *
 #  0.00 beta     2025-05-27  JS     -Introduction preparation                              *
 #  0.01 beta     2025-09-25  JS     -windows updates
+#  0.02 beta     2025-09-26  JS     -Linux basic copy ready
 # .PLAN
 #  1.0 - Introduction (basic copy functions, ready for windows and linux systems)
 #  2.0 - Replace const
@@ -19,10 +20,8 @@
 # Import
 #*******************************************************************************************
 import os
-import re
 import shutil
 import glob
-import json
 import xml.etree.ElementTree as ET
 import string
 import stat
@@ -40,7 +39,6 @@ IS_LINUX = platform.system() == 'Linux'
 # ***************************************************************************************************
 # Konstants
 # ***************************************************************************************************
-LOCAL_PATH = 'C:\\temp\\__Python\\' if IS_WINDOWS else '/tmp/__Python/'
 
 
 #***************************************************************************************************
@@ -243,8 +241,8 @@ current_folder = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-#defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+#defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
 config_file_path = input("Please enter path to xml config file ["+str(defaul_config_file_path)+"]:")
 if (config_file_path == ""):
