@@ -1,6 +1,6 @@
-<Variant name="ABCD">
+<MainNode name="whatever">
   <Drive>C</Drive>
-  <DeliveryPath>\Delivery</DeliveryPath>
+  <DeliveryPath>C:\Users\z604666\PycharmProjects\MyProject01\CopyToDeliveryRepoGitHub\Delivery</DeliveryPath>
   <DeliveryPathSubDirs>
     <DirItem name="\SubExampleA"/>
     <DirItem name="\SubExampleB"/>
@@ -19,7 +19,7 @@
     <ConstItem xml_const="#VARIANT_LETTER" value="Variant_A"/>
   </ReplaceConst>
 
- <BuildOutput path="\CopyToDeliveryExampleSource"/>
+ <BuildOutput path="C:\Users\z604666\PycharmProjects\MyProject01\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource"/>
 
  <CopySet>
    <!-- Template of copy cases -->
@@ -36,15 +36,15 @@
 
    <!-- ************ Copy 1 specific file from specific path -->
    <Where name="\SubExampleB">
-     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\b.txt"     path="full"/>
+     <Item what="C:\Users\z604666\PycharmProjects\MyProject01\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\b.txt"     path="full"/>
    </Where>
 
    <!-- ************ Copy 1 specific file from specific path into root target folder-->
    <Where name="\">
-    <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\c.txt"      path="full"/>
+    <Item what="C:\Users\z604666\PycharmProjects\MyProject01\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\c.txt"      path="full"/>
    </Where>
    <Where name="\">
-    <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\#VARIANT_NUMBER\c.txt"      path="full"/>
+    <Item what="C:\Users\z604666\PycharmProjects\MyProject01\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\#VARIANT_NUMBER\c.txt"      path="full"/>
    </Where>
 
    <!-- ************ Copy folder with content -->
@@ -73,7 +73,7 @@
    </Where>
 
  </CopySet>
-</Variant>
+</MainNode>
 
 
 

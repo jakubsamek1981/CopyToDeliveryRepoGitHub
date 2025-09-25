@@ -9,6 +9,7 @@
 # .HISTORY                                                                                 *
 #  Version  Date      Author  Comment                                                      *
 #  0.00 beta     2025-05-27  JS     -Introduction preparation                              *
+#  0.01 beta     2025-09-25  JS     -windows updates
 # .PLAN
 #  1.0 - Introduction (basic copy functions, ready for windows and linux systems)
 #  2.0 - Replace const
@@ -74,7 +75,7 @@ def colect_copy_data(config_file_path):
     copy_data["main_node"] = xml_obj.getroot()
 
     system = platform.system()
-    if system == "Windows":
+    if IS_WINDOWS:
         print("Running on Windows")
         # gain and test source drive
         source_drive_elem = copy_data["main_node"].find("SourceDrive")
@@ -98,7 +99,7 @@ def colect_copy_data(config_file_path):
             #cprint("Script stoped",'red')
             print("!!! Script stoped !!!", 'red')
             exit()
-    elif system == "Linux":
+    elif IS_LINUX:
         print("Running on Linux")
         script_start_dir = os.getcwd()
 
@@ -125,7 +126,7 @@ def colect_copy_data(config_file_path):
     else:
         target_path = target_path_elem.text
 
-    if system == "Windows":
+    if IS_WINDOWS:
         drive_tail = os.path.splitdrive(target_path)
         if (drive_tail[0] == ""):
             target_path = source_drive + target_path
@@ -133,7 +134,7 @@ def colect_copy_data(config_file_path):
         print("Drive of path '%s':" %target_path, drive_tail[0])
         print("Tail of path '%s':" %target_path, drive_tail[1])
         print(target_path)
-    elif system == "Linux":
+    elif IS_LINUX:
         target_path = os.path.normpath(script_start_dir + target_path)
     if (os.path.exists(target_path)):
         copy_data["target_path"] = target_path
@@ -242,8 +243,8 @@ current_folder = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-#defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+#defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
 config_file_path = input("Please enter path to xml config file ["+str(defaul_config_file_path)+"]:")
 if (config_file_path == ""):
