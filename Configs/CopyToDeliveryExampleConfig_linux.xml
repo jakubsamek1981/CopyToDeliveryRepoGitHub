@@ -19,7 +19,7 @@
     <ConstItem xml_const="#VARIANT_LETTER" value="Variant_A"/>
   </ReplaceConst>
 
- <BuildOutput path="/CopyToDeliveryExampleSource"/>
+ <BuildOutput path="/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource"/>
 
  <CopySet>
    <!-- Template of copy cases -->
@@ -36,7 +36,7 @@
 
    <!-- ************ Copy 1 specific file from specific path -->
    <Where name="\SubExampleB">
-     <Item what="\home\developer\CopyToDelivery\CopyToDeliveryExampleSource\b.txt"     path="full"/>
+     <Item what="/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/b.txt"     path="full"/>
    </Where>
 
    <!-- ************ Copy 1 specific file from specific path into root target folder-->

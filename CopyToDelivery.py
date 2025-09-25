@@ -187,17 +187,25 @@ def perform_copy(copy_data):
     for where in copy_set:
         var_where = ''.join([copy_data["target_path"], where.get("name")])
         if (not ("." in str(var_where))):
-            if ((str(var_where)[-1]) != "\\"):
-                var_where = ''.join([str(var_where), "\\"])
+            if IS_WINDOWS:
+                if ((str(var_where)[-1]) != "\\"):
+                    var_where = ''.join([str(var_where), "\\"])
+            if IS_LINUX:
+                if ((str(var_where)[-1]) != "/"):
+                    var_where = ''.join([str(var_where), "/"])
         #add test if there is file name in where element
         print(var_where)
         for item in where:
             var_what = item.get("what")
             if "path" in item.attrib:
                 if (item.get("path") == "BuildOutput"):
-                    var_what = ''.join([copy_data["source_drive"], build_output, var_what])
-            if (not (":" in str(var_what))):
-                var_what = ''.join([copy_data["source_drive"], var_what])
+                    if IS_WINDOWS:
+                        var_what = ''.join([copy_data["source_drive"], build_output, var_what])
+                    if IS_LINUX:
+                        var_what = os.path.normpath(build_output + var_what)
+            if IS_WINDOWS:
+                if (not (":" in str(var_what))):
+                    var_what = ''.join([copy_data["source_drive"], var_what])
             if os.path.isdir(var_what):
                 if (os.path.exists(var_where)):
                     force_remove_readonly(var_where)
