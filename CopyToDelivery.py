@@ -11,6 +11,13 @@
 #  0.00 beta     2025-05-27  JS     -Introduction preparation                              *
 #  0.01 beta     2025-09-25  JS     -windows updates
 #  0.02 beta     2025-09-26  JS     -Linux basic copy ready
+#  0.03 beta     2025-09-27  JS     -Windows absolute / relative path
+#  0.04 beta     2025-09-29  JS     -Refactor config elements and attributes, optimize program
+
+#  .Beta plan
+#  0.05 beta     2025-09-27  JS     -test absolute / relative path on Linux
+#  0.06 beta     2025-09-28  JS     -Change BuildOutput -> Source, Delivery -> Target ???
+
 # .PLAN
 #  1.0 - Introduction (basic copy functions, ready for windows and linux systems)
 #  2.0 - Replace const
@@ -72,68 +79,17 @@ def colect_copy_data(config_file_path):
     xml_obj = ET.parse(config_file_path)
     copy_data["main_node"] = xml_obj.getroot()
 
-    system = platform.system()
-    if IS_WINDOWS:
-        print("Running on Windows")
-        # gain and test source drive
-        source_drive_elem = copy_data["main_node"].find("SourceDrive")
-        if (source_drive_elem is None):
-            source_drive_elem = copy_data["main_node"].find("Drive")
-        if (source_drive_elem is not None):
-            if (source_drive_elem.text is None):
-                source_drive = input("Source drive was not found in config file. Please enter the Source drive:")
-            else:
-                if (source_drive_elem.text in string.ascii_low_and_upp):
-                    source_drive = source_drive_elem.text
-                else:
-                    source_drive = input("Source drive was not found in config file. Please enter the Source drive:")
-        else:
-            source_drive = input("Source drive was not found in config file. Please enter the Source drive:")
-        source_drive = source_drive + ":"
-        if (os.path.exists(source_drive)):
-            copy_data["source_drive"] = source_drive
-        else:
-            print("Source drive does not exist.")
-            #cprint("Script stoped",'red')
-            print("!!! Script stoped !!!", 'red')
-            exit()
-    elif IS_LINUX:
-        print("Running on Linux")
-        script_start_dir = os.getcwd()
-
-    # read input file
-    f = open(config_file_path, "rt")
-    # read file contents to string
-    data = f.read()
-    # replace all occurrences of the required string
-    #data = data.replace("#SW_NAME#", "ABCD")
-    # close the input file
-    f.close()
-
-    #gain again xml object data
-    xml_obj = ET.fromstring(data)
-    #store xml dato into copy_data["main_note"]
-    copy_data["main_node"] = xml_obj
-
     # gain and test target path
-    target_path_elem = copy_data["main_node"].find("TargetPath")
+    script_start_dir = os.getcwd()
+    target_path_elem = copy_data["main_node"].find("DeliveryPath")
     if (target_path_elem is None):
-        target_path_elem = copy_data["main_node"].find("DeliveryPath")
-    if (target_path_elem is None):
-        target_path = input("TargetPath was not found in config file. Please enter the TargetPath:")
+        target_path = input("DeliveryPath was not found in config file. Please enter the DeliveryPath:")
     else:
-        target_path = target_path_elem.text
+        if (target_path_elem.get("path_type") == "relative"):
+            target_path = os.path.normpath(script_start_dir + target_path_elem.text.strip())
+        else:
+            target_path = target_path_elem.text.strip()
 
-    if IS_WINDOWS:
-        drive_tail = os.path.splitdrive(target_path)
-        if (drive_tail[0] == ""):
-            target_path = source_drive + target_path
-        drive_tail = os.path.splitdrive(target_path)
-        print("Drive of path '%s':" %target_path, drive_tail[0])
-        print("Tail of path '%s':" %target_path, drive_tail[1])
-        print(target_path)
-    elif IS_LINUX:
-        target_path = os.path.normpath(script_start_dir + target_path)
     if (os.path.exists(target_path)):
         copy_data["target_path"] = target_path
     else:
@@ -146,17 +102,17 @@ def colect_copy_data(config_file_path):
         if (os.path.exists(target_path)):
             copy_data["target_path"] = target_path
         else:
-            print("TargetPath does not exist.")
+            print("DeliveryPath does not exist.")
             print("!!! Script stoped !!!")
             exit()
 
     return copy_data
 
 def perform_copy(copy_data):
-    #For debug you can use following command:
-    #print (ET.dump(copy_data["main_node"]))
+    # For debug you can use following command:
+    # print (ET.dump(copy_data["main_node"]))
 
-    #Prepare output dir
+    # Prepare output dir
     target_path = copy_data["target_path"]
     if (os.path.exists(target_path)):
         delete_if_exist = copy_data["main_node"].find("DeleteIfExist")
@@ -175,36 +131,39 @@ def perform_copy(copy_data):
                 exit()
     os.makedirs(target_path)
 
-    #Create folder structure if requested
+    # Create folder structure if requested
     xml_sub_directories = copy_data["main_node"].find("DeliveryPathSubDirs")
     if (xml_sub_directories is not None):
       create_folder_structure(xml_sub_directories,target_path)
 
-    #Start copy sequence
-    build_output = copy_data["main_node"].find("BuildOutput").get("path")
+    # Start copy sequence
     copy_set = copy_data["main_node"].find("CopySet")
     for where in copy_set:
-        var_where = ''.join([copy_data["target_path"], where.get("name")])
-        if (not ("." in str(var_where))):
-            if IS_WINDOWS:
-                if ((str(var_where)[-1]) != "\\"):
-                    var_where = ''.join([str(var_where), "\\"])
-            if IS_LINUX:
-                if ((str(var_where)[-1]) != "/"):
-                    var_where = ''.join([str(var_where), "/"])
-        #add test if there is file name in where element
-        print(var_where)
+        if (where.get("path_type") == "relative"):
+            # var_where = ''.join([script_start_dir, where.text])
+            # .strip() function must be used do read xml element text to remove whitespaces "\n"
+            var_where = os.path.normpath(target_path + (where.text.strip()))
+        elif(where.get("path_type") == "absolute"):
+            var_where = where.text
+        else:
+           print(where.text)
+           print("parameter path_type does not exist")
+        # test if target path exist
+        if (not (where.get("copy_type") == "rename")):
+            if (os.path.exists(var_where)):
+                print(var_where)
+            else:
+                print(var_where)
+                print("target path does not exist")
+        # loop through items in where element
         for item in where:
-            var_what = item.get("what")
-            if "path" in item.attrib:
-                if (item.get("path") == "BuildOutput"):
-                    if IS_WINDOWS:
-                        var_what = ''.join([copy_data["source_drive"], build_output, var_what])
-                    if IS_LINUX:
-                        var_what = os.path.normpath(build_output + var_what)
-            if IS_WINDOWS:
-                if (not (":" in str(var_what))):
-                    var_what = ''.join([copy_data["source_drive"], var_what])
+            var_what = item.text.strip()
+            if "path_type" in item.attrib:
+                if item.get("path_type") == "relative":
+                    if (item.get("path_type") == "relative"):
+                        var_what = os.path.normpath(script_start_dir + item.text.strip())
+                    else:
+                        var_what = os.path.normpath(item.text.strip())
             if os.path.isdir(var_what):
                 if (os.path.exists(var_where)):
                     force_remove_readonly(var_where)
@@ -214,26 +173,34 @@ def perform_copy(copy_data):
                 # pattern1 = '*.txt'
                 # matching_filenames_1 = glob.glob(pattern1)
                 # ['file1.txt', 'file2.txt', 'file3.txt']
-                matching_filenames = glob.glob(var_what)
-                for item_2 in matching_filenames:
-                    # shutil.copy2('src_file.txt', 'dest_file.txt')
-                    var_what = item_2
-                    print("what: ", var_what)
-                    #shutil.copy2(var_what, var_where)
-                    if os.path.isdir(var_what):
-                        # copy all subdirs recursively
-                        var_where_sub = var_where + os.path.basename(item_2)
-                        shutil.copytree(var_what, var_where_sub)
-                        var_where_sub = ""
-                    else:
-                        if (not(item.get("file") == "rename")):
-                            os.makedirs(var_where, exist_ok=True)
-                        shutil.copy2(var_what, var_where)
+                matching_filenames = glob.glob(os.path.normpath(var_what))
+                if matching_filenames==[]:
+                    print("Error source path does not exist: ", var_what)
+                else:
+                    for item_2 in matching_filenames:
+                        # shutil.copy2('src_file.txt', 'dest_file.txt')
+                        var_what = item_2
+                        print("WhatSourceItem: ", var_what)
+                        # shutil.copy2(var_what, var_where)
+                        if os.path.isdir(var_what):
+                            # copy all subdirs recursively
+                            var_where_sub = var_where + os.path.basename(item_2)
+                            shutil.copytree(var_what, var_where_sub)
+                            var_where_sub = ""
+                        else:
+                            if (not(where.get("copy_type") == "rename")):
+                                if (os.path.exists(var_what)):
+                                    os.makedirs(var_where, exist_ok=True)
+                                    shutil.copy2(var_what, var_where)
+                                else:
+                                    print("Error source path does not exist: ", var_what)
+                            else:
+                                shutil.copy2(var_what, var_where)
 
 # ***************************************************************************************************
 # Main
 # ***************************************************************************************************
-current_folder = os.getcwd()
+script_start_dir = os.getcwd()
 #print('getcwd:      ', os.getcwd())
 
 #defaul_config_file_path = os.path.normpath(current_folder+"\\Configs\\CopyToDeliveryExampleConfig.xml")
@@ -241,8 +208,8 @@ current_folder = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-#defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+#defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
 config_file_path = input("Please enter path to xml config file ["+str(defaul_config_file_path)+"]:")
 if (config_file_path == ""):
