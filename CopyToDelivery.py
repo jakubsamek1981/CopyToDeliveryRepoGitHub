@@ -14,8 +14,9 @@
 #  0.03 beta     2025-09-27  JS     -Windows absolute / relative path
 #  0.04 beta     2025-09-29  JS     -Refactor config elements and attributes, optimize program
 #  0.05 beta     2025-09-27  JS     -test absolute / relative path on Linux
+#  0.06 beta     2025-09-27  JS     -cleanup and update on Linux
 #  .Beta plan
-#  0.06 beta     2025-09-28  JS     -Change BuildOutput -> Source, Delivery -> Target ???
+#  0.07 beta     2025-09-28  JS     -Change BuildOutput -> Source, Delivery -> Target ???
 
 # .PLAN
 #  1.0 - Introduction (basic copy functions, ready for windows and linux systems)
@@ -143,7 +144,7 @@ def perform_copy(copy_data):
             # .strip() function must be used do read xml element text to remove whitespaces "\n"
             var_where = os.path.normpath(target_path + (where.text.strip()))
         elif(where.get("path_type") == "absolute"):
-            var_where = where.text
+            var_where = os.path.normpath(where.text.strip())
         else:
            print(where.text)
            print("parameter path_type does not exist")
