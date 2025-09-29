@@ -1,6 +1,7 @@
-<MainNode name="whatever">
-  <Drive>/home</Drive>
-  <DeliveryPath>/Delivery</DeliveryPath>
+<MainNode>
+  <!-- <DeliveryPath path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/Delivery</DeliveryPath> -->
+  <!-- <DeliveryPath path_type="relative">/../Delivery</DeliveryPath> -->
+  <DeliveryPath path_type="relative">/Delivery</DeliveryPath>
   <DeliveryPathSubDirs>
     <DirItem name="/SubExampleA"/>
     <DirItem name="/SubExampleB"/>
@@ -8,40 +9,55 @@
   <DeleteIfExist>yes</DeleteIfExist>
   <CreateIfNotExist>yes</CreateIfNotExist>
 
- <BuildOutput path="/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource"/>
-
- <CopySet>
-   <!-- Template of copy cases -->
+  <CopySet>
    <!-- Known attributes: -->
-     <!-- path="BuildOutput" -->
-     <!-- path="full" -->
-     <!-- file="rename" -->
+     <!-- path_target="\CopyToDeliveryExampleSource\SubExampleA" -->
+     <!-- path_source="\a.txt" -->
+     <!-- path_type="absolute" -->
+     <!-- path_type="relative" -->
+     <!-- copy_type="rename" -->
 
-   <!-- ************ Copy 2 specific file from BuildOutput path -->
-   <Where name="/SubExampleA">
-     <Item what="/a.txt"                                                              path="BuildOutput"/> -->
-     <Item what="/subb/b.txt"                                                         path="BuildOutput"/> -->
-   </Where>
+    <!-- ************ Copy 2 specific file from BuildOutput path -->
+    <WhereTarget  path_type="relative">
+      /SubExampleA
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/a.txt</WhatSourceItem>
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/subb/subb.txt</WhatSourceItem>
+    </WhereTarget>
 
-   <!-- ************ Copy 1 specific file from specific path -->
-   <Where name="/SubExampleB">
-     <Item what="/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/b.txt"     path="full"/>
-   </Where>
+    <!-- ************ Copy 1 specific file from specific path -->
+    <WhereTarget  path_type="relative">
+      /SubExampleB
+      <WhatSourceItem path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/b.txt</WhatSourceItem>
+    </WhereTarget>
 
-   <!-- ************ Copy folder with content -->
-   <Where name="/">
-     <Item what="/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/subc/*"    path="full"/>
-   </Where>
+    <!-- ************ Copy 1 specific file from specific path into root target folder-->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/c.txt</WhatSourceItem>
+    </WhereTarget>
 
-   <!-- ************ Copy multiple files -->
-   <Where name="/SubExampleA">
-     <Item what="/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/suba/*.xml"        path="full"/>
-   </Where>
+    <!-- ************ Copy folder with content -->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/subc/*</WhatSourceItem>
+    </WhereTarget>
+
+    <!-- ************ Copy multiple files -->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/suba/*.xml</WhatSourceItem>
+    </WhereTarget>
 
    <!-- ************ Copy and rename one specific file -->
-   <Where name="/SubExampleA/a_renamed_#VARIANT_LETTER.txt">
-     <Item what="/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/c.txt"            file="rename"/>
-   </Where>
+    <WhereTarget  path_type="relative" copy_type="rename">
+      /a_renamed_c.txt
+      <WhatSourceItem path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/c.txt</WhatSourceItem>
+    </WhereTarget>
+    <!-- ************ Copy and rename one specific file -->
+    <WhereTarget  path_type="relative" copy_type="rename">
+      /a_renamed_c.txt
+      <WhatSourceItem path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/ac.txt</WhatSourceItem>
+    </WhereTarget>
 
  </CopySet>
 </MainNode>

@@ -13,9 +13,8 @@
 #  0.02 beta     2025-09-26  JS     -Linux basic copy ready
 #  0.03 beta     2025-09-27  JS     -Windows absolute / relative path
 #  0.04 beta     2025-09-29  JS     -Refactor config elements and attributes, optimize program
-
-#  .Beta plan
 #  0.05 beta     2025-09-27  JS     -test absolute / relative path on Linux
+#  .Beta plan
 #  0.06 beta     2025-09-28  JS     -Change BuildOutput -> Source, Delivery -> Target ???
 
 # .PLAN
@@ -208,8 +207,8 @@ script_start_dir = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-#defaul_config_file_path = os.path.normpath(current_folder+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+#defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
 config_file_path = input("Please enter path to xml config file ["+str(defaul_config_file_path)+"]:")
 if (config_file_path == ""):
