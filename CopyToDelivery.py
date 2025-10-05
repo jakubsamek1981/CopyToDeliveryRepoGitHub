@@ -253,12 +253,12 @@ script_start_dir = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-#defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+#default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
-config_file_path = input("Please enter path to xml config file ["+str(defaul_config_file_path)+"]:")
+config_file_path = input("Please enter path to xml config file ["+str(default_config_file_path)+"]:")
 if (config_file_path == ""):
-    config_file_path = defaul_config_file_path
+    config_file_path = default_config_file_path
 print(config_file_path)
 #collect and test input data
 copy_data = colect_copy_data(config_file_path)
