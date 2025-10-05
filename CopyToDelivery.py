@@ -8,34 +8,22 @@
 #              R E V I S I O N   H I S T O R Y                                             *
 # .HISTORY                                                                                 *
 #  Version  Date      Author  Comment                                                      *
-#  0.00 beta     2025-05-27  JS     -Introduction preparation                              *
-#  0.01 beta     2025-09-25  JS     -windows updates
-#  0.02 beta     2025-09-26  JS     -Linux basic copy ready
-#  0.03 beta     2025-09-27  JS     -Windows absolute / relative path
-#  0.04 beta     2025-09-29  JS     -Refactor config elements and attributes, optimize program
-#  0.05 beta     2025-09-27  JS     -test absolute / relative path on Linux
-#  0.06 beta     2025-09-27  JS     -cleanup and update on Linux
-#  .Beta plan
-#  0.07 beta     2025-09-28  JS     -Change BuildOutput -> Source, Delivery -> Target ???
-
-# .PLAN
 #  1.0 - Introduction (basic copy functions, ready for windows and linux systems)
 #  2.0 - Replace const
+# .PLAN
 #  3.0 - Add zip files
 #  4.0 - Log messages
 #*******************************************************************************************
 # Import
 #*******************************************************************************************
 import os
+import re
 import shutil
 import glob
 import xml.etree.ElementTree as ET
 import string
 import stat
 import platform
-
-string.ascii_low_and_upp = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
 
 #***************************************************************************************************
 # Global Variables
@@ -106,6 +94,64 @@ def colect_copy_data(config_file_path):
             print("!!! Script stoped !!!")
             exit()
 
+    # Check for ConditionsForContinue
+    cond_for_continue = copy_data["main_node"].find("ConditionsForContinue")
+    if (cond_for_continue is not None):
+        for cond_item in cond_for_continue:
+            check_path = cond_item.text.strip()
+            if (cond_item.get("path_type") == "relative"):
+                # var_where = ''.join([script_start_dir, where.text])
+                # .strip() function must be used do read xml element text to remove whitespaces "\n"
+                check_path = os.path.normpath(script_start_dir + (cond_item.text.strip()))
+            if (not os.path.exists(check_path)):
+                print("Condition does not exist: ", check_path)
+                print("Script stoped. Fulfill the condition or delete condition form xml config file. ")
+
+    # **** Block replace const in config file ****
+    # read input file
+    f = open(config_file_path, "rt")
+    # read file contents to string
+    data = f.read()
+    # close the input file
+    f.close()
+
+    # replace all const read listed in xml config file
+    replace_const = copy_data["main_node"].find("ReplaceConst")
+    if (replace_const is not None):
+        for replace_item in replace_const:
+            replace_item_const = replace_item.get("xml_const")
+            replace_item_value = replace_item.get("value")
+            # replace all occurrences of the required string in string data read from config file
+            # data = data.replace("#VARIANT", "var456")
+            data = data.replace(replace_item_const, replace_item_value)
+
+    # replace all const read from file
+    replace_const = copy_data["main_node"].find("ReadReplaceConst")
+    if (replace_const is not None):
+        for replace_item in replace_const:
+            replace_item_path = replace_item.text.strip()
+            if (replace_item.get("path_type") == "relative"):
+                # var_where = ''.join([script_start_dir, where.text])
+                # .strip() function must be used do read xml element text to remove whitespaces "\n"
+                replace_item_path = os.path.normpath(script_start_dir + (replace_item.text.strip()))
+            if (not os.path.exists(replace_item_path)):
+                print("Replace item path does not exist.")
+                print("!!! Script stoped !!!")
+                exit()
+            f = open(replace_item_path, "rt")
+            repplace_item_data = f.read()
+            f.close()
+            replace_item_regex = replace_item.get("regex")
+            replace_item_value = re.search(replace_item_regex, repplace_item_data).group(1)
+            replace_item_const = replace_item.get("xml_const")
+            # replace all occurrences of the required string in string data read from xml config file
+            # data = data.replace("#SW_NAME#", "ABCD")
+            data = data.replace(replace_item_const, replace_item_value)
+
+    # parse xml data
+    xml_obj = ET.fromstring(data)
+    copy_data["main_node"] = xml_obj
+
     return copy_data
 
 def perform_copy(copy_data):
@@ -153,8 +199,7 @@ def perform_copy(copy_data):
             if (os.path.exists(var_where)):
                 print(var_where)
             else:
-                print(var_where)
-                print("target path does not exist")
+                print("target path does not exist:", var_where)
         # loop through items in where element
         for item in where:
             var_what = item.text.strip()
@@ -208,8 +253,8 @@ script_start_dir = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-#defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+#defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
 config_file_path = input("Please enter path to xml config file ["+str(defaul_config_file_path)+"]:")
 if (config_file_path == ""):
@@ -219,4 +264,3 @@ print(config_file_path)
 copy_data = colect_copy_data(config_file_path)
 #perform copy
 perform_copy(copy_data)
-

@@ -1,1 +1,2 @@
-var_number = Variant123
+ModelEdition1 = ModelABC
+ModelEdition2 = ModelXYZ
