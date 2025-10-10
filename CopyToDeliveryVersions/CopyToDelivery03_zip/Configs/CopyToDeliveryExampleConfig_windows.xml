@@ -114,14 +114,14 @@
       \
       <WhatSourceItem path_type="relative">\CopyToDeliveryExampleSource\TestZipx.zipx\subZipxC\*</WhatSourceItem>
     </WhereTarget>
-	
+
     <!-- ************ Test of recursive copy of whole folder packed in an .zipx file -->
 	<!-- ************ !!!!!!!  BUG  !!!!!!!!!! following item will remove all previous -->
     <!-- <WhereTarget  path_type="relative"> -->
     <!--   \ -->
     <!--   <WhatSourceItem path_type="relative">\CopyToDeliveryExampleSource\TestZipx.zipx\subZipxC</WhatSourceItem> -->
     <!-- </WhereTarget> -->
-	
+
 	<!-- ************ Test of recursive copy of whole folder packed in an .zipx file -->
     <WhereTarget  path_type="relative">
       \TestZipx\subZipxB
