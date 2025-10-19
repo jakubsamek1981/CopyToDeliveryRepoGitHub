@@ -268,23 +268,36 @@ def perform_copy(copy_data):
                         zipfile_path = var_what[:(zipindex + 5)]
                         # var_what[(zipindex):] takes characters from zipindex to the end
                         zipfile_path_rest = var_what[(zipindex + 6):]
-                        unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-5] + "\\"
+                        if IS_WINDOWS:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-5] + "\\"
+                        if IS_LINUX:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[:-5] + "/"
                     elif (".7z" in str(var_what)):
                         zipindex = var_what.index(".7z")
                         zipfile_path = var_what[:(zipindex + 3)]
                         zipfile_path_rest = var_what[(zipindex + 4):]
-                        unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-3] + "\\"
+                        if IS_WINDOWS:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-3] + "\\"
+                        if IS_LINUX:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[:-3] + "/"
                     else:
                         zipindex = var_what.index(".zip")
                         zipfile_path = var_what[:(zipindex + 4)]
                         zipfile_path_rest = var_what[(zipindex + 5):]
-                        unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-4] + "\\"
+                        if IS_WINDOWS:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-4] + "\\"
+                        if IS_LINUX:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[:-4] + "/"
                     new_unziped_file_path = unzip_temp_path + zipfile_path_rest
                     # print(zipfile_path)
                     # print(new_unziped_file_path)
                     if (not os.path.exists(unzip_temp_path)):
-                        my_os_command = zipapp_path + " x " + zipfile_path + " -o" + unzip_temp_path + " -r"
-                        os.system(my_os_command)
+                        if IS_WINDOWS:
+                            my_os_command = zipapp_path + " x " + zipfile_path + " -o" + unzip_temp_path + " -r"
+                            os.system(my_os_command)
+                        if IS_LINUX:
+                            my_os_command = zipapp_path + " x " + zipfile_path + " -o" + unzip_temp_path
+                            os.system(my_os_command)
                     var_what = new_unziped_file_path
 
             # pattern1 = '*.txt'
@@ -331,8 +344,8 @@ script_start_dir = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-#default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+#default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
 config_file_path = input("Please enter path to xml config file ["+str(default_config_file_path)+"]:")
 if (config_file_path == ""):
