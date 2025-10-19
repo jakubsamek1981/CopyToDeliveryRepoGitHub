@@ -115,8 +115,8 @@
 
 	<!-- ************ Test of recursive copy of whole folder packed in an .zipx file -->
     <WhereTarget  path_type="relative">
-      /
-      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/TestZipx.zipx/subZipxB</WhatSourceItem>
+      /TestZipx/subZipxB
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/TestZipx.zipx/subZipxB/*</WhatSourceItem>
     </WhereTarget>
 
  </CopySet>

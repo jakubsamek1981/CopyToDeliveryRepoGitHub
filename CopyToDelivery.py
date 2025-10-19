@@ -318,7 +318,10 @@ def perform_copy(copy_data):
                         if var_what[-1:] == "*":
                             var_what = var_what[:-1]
                         # path subraction final target path = delivery path + (longer - shorter)
-                        var_where_sub = var_where + "\\" + item_2[len(var_what):]
+                        if IS_WINDOWS:
+                            var_where_sub = var_where + "\\" + item_2[len(var_what):]
+                        if IS_LINUX:
+                            var_where_sub = var_where + "/" + item_2[len(var_what):]
                         if (os.path.exists(var_where_sub)):
                             force_remove_readonly(var_where_sub)
                         shutil.copytree(var_what2, var_where_sub)
