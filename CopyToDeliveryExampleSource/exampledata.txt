@@ -1,0 +1,2 @@
+ModelEdition1 = ModelABC
+ModelEdition2 = ModelXYZ

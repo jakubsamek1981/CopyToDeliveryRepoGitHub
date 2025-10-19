@@ -1,0 +1,87 @@
+<MainNode>
+  <!-- <DeliveryPath path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\Delivery</DeliveryPath> -->
+  <!-- <DeliveryPath path_type="relative">\..\Delivery</DeliveryPath> -->
+  <DeliveryPath path_type="relative">\Delivery</DeliveryPath>
+  <DeliveryPathSubDirs>
+    <DirItem name="\SubExampleA"/>
+    <DirItem name="\SubExampleB"/>
+  </DeliveryPathSubDirs>
+  <DeleteIfExist>yes</DeleteIfExist>
+  <CreateIfNotExist>yes</CreateIfNotExist>
+  <ConditionsForContinue>
+    <ConditionItemPath path_type="relative">\CopyToDeliveryExampleSource\exampledata.txt</ConditionItemPath>
+  </ConditionsForContinue>
+  <ReplaceConst>
+    <ConstItem xml_const="#VARIANT" value="var456"/>
+  </ReplaceConst>
+  <ReadReplaceConst>
+    <ConstItem xml_const="#MODEL_EDITION_1" regex="ModelEdition1\s*=\s*(\S+)" path_type="relative">\CopyToDeliveryExampleSource\exampledata.txt</ConstItem>
+  </ReadReplaceConst>
+
+
+
+  <CopySet>
+   <!-- Known attributes: -->
+     <!-- path_type="absolute" -->
+     <!-- path_type="relative" -->
+     <!-- copy_type="rename" -->
+
+    <!-- ************ Copy 2 specific file from relative path -->
+    <WhereTarget  path_type="relative">
+      \SubExampleA
+      <WhatSourceItem path_type="relative">\CopyToDeliveryExampleSource\a.txt</WhatSourceItem>
+      <WhatSourceItem path_type="relative">\CopyToDeliveryExampleSource\subb\subb.txt</WhatSourceItem>
+    </WhereTarget>
+
+    <!-- ************ Copy 1 specific file from specific absolute path -->
+    <WhereTarget  path_type="absolute">
+      C:\temp\CopyToDeliveryRepoGitHub\Delivery\SubExampleB
+      <WhatSourceItem path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\b.txt</WhatSourceItem>
+    </WhereTarget>
+
+    <!-- ************ Copy 1 specific file from specific path into root target folder-->
+    <WhereTarget  path_type="relative">
+      \
+      <WhatSourceItem path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\c.txt</WhatSourceItem>
+    </WhereTarget>
+
+    <!-- ************ Copy folder with content -->
+    <WhereTarget  path_type="relative">
+      \
+      <WhatSourceItem path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\subc\*</WhatSourceItem>
+    </WhereTarget>
+
+    <!-- ************ Copy multiple files -->
+    <WhereTarget  path_type="relative">
+      \
+      <WhatSourceItem path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\suba\*.xml</WhatSourceItem>
+    </WhereTarget>
+
+   <!-- ************ Copy and rename one specific file -->
+    <WhereTarget  path_type="relative" copy_type="rename">
+      \a_renamed_c.txt
+      <WhatSourceItem path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\c.txt</WhatSourceItem>
+    </WhereTarget>
+
+    <!-- ************ Test wrong cases -->
+    <!-- ************ Copy and rename one specific file Test wrong source-->
+    <WhereTarget  path_type="relative" copy_type="rename">
+      \a_renamed_c.txt
+      <WhatSourceItem path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\ac.txt</WhatSourceItem>
+    </WhereTarget>
+    <!-- ************ Copy 1 specific file from specific with wrong absolute target path -->
+    <WhereTarget  path_type="absolute">
+      C:\temp\CopyToDeliveryRepoGitHub\Delivery\Wrong
+      <WhatSourceItem path_type="absolute">C:\temp\CopyToDeliveryRepoGitHub\CopyToDeliveryExampleSource\b.txt</WhatSourceItem>
+    </WhereTarget>
+
+
+    <!-- ************ Copy 1 specific file from specific path into root target folder Text Replace functionality -->
+    <WhereTarget  path_type="relative">
+      \
+      <WhatSourceItem path_type="relative">\CopyToDeliveryExampleSource\subModels\#MODEL_EDITION_1\#VARIANT.txt</WhatSourceItem>
+    </WhereTarget>
+
+
+ </CopySet>
+</MainNode>
