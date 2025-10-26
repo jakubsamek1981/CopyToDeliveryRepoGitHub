@@ -9,14 +9,15 @@
 # .HISTORY                                                                                 *
 #  Version  Date      Author  Comment                                                      *
 #  1.0 - Introduction (basic copy functions, ready for windows and linux systems)
-# .PLAN
 #  2.0 - Replace const
+# .PLAN
 #  3.0 - Add zip files
 #  4.0 - Log messages
 #*******************************************************************************************
 # Import
 #*******************************************************************************************
 import os
+import re
 import shutil
 import glob
 import xml.etree.ElementTree as ET
@@ -92,6 +93,64 @@ def colect_copy_data(config_file_path):
             print("DeliveryPath does not exist.")
             print("!!! Script stoped !!!")
             exit()
+
+    # Check for ConditionsForContinue
+    cond_for_continue = copy_data["main_node"].find("ConditionsForContinue")
+    if (cond_for_continue is not None):
+        for cond_item in cond_for_continue:
+            check_path = cond_item.text.strip()
+            if (cond_item.get("path_type") == "relative"):
+                # var_where = ''.join([script_start_dir, where.text])
+                # .strip() function must be used do read xml element text to remove whitespaces "\n"
+                check_path = os.path.normpath(script_start_dir + (cond_item.text.strip()))
+            if (not os.path.exists(check_path)):
+                print("Condition does not exist: ", check_path)
+                print("Script stoped. Fulfill the condition or delete condition form xml config file. ")
+
+    # **** Block replace const in config file ****
+    # read input file
+    f = open(config_file_path, "rt")
+    # read file contents to string
+    data = f.read()
+    # close the input file
+    f.close()
+
+    # replace all const read listed in xml config file
+    replace_const = copy_data["main_node"].find("ReplaceConst")
+    if (replace_const is not None):
+        for replace_item in replace_const:
+            replace_item_const = replace_item.get("xml_const")
+            replace_item_value = replace_item.get("value")
+            # replace all occurrences of the required string in string data read from config file
+            # data = data.replace("#VARIANT", "var456")
+            data = data.replace(replace_item_const, replace_item_value)
+
+    # replace all const read from file
+    replace_const = copy_data["main_node"].find("ReadReplaceConst")
+    if (replace_const is not None):
+        for replace_item in replace_const:
+            replace_item_path = replace_item.text.strip()
+            if (replace_item.get("path_type") == "relative"):
+                # var_where = ''.join([script_start_dir, where.text])
+                # .strip() function must be used do read xml element text to remove whitespaces "\n"
+                replace_item_path = os.path.normpath(script_start_dir + (replace_item.text.strip()))
+            if (not os.path.exists(replace_item_path)):
+                print("Replace item path does not exist.")
+                print("!!! Script stoped !!!")
+                exit()
+            f = open(replace_item_path, "rt")
+            repplace_item_data = f.read()
+            f.close()
+            replace_item_regex = replace_item.get("regex")
+            replace_item_value = re.search(replace_item_regex, repplace_item_data).group(1)
+            replace_item_const = replace_item.get("xml_const")
+            # replace all occurrences of the required string in string data read from xml config file
+            # data = data.replace("#SW_NAME#", "ABCD")
+            data = data.replace(replace_item_const, replace_item_value)
+
+    # parse xml data
+    xml_obj = ET.fromstring(data)
+    copy_data["main_node"] = xml_obj
 
     return copy_data
 
@@ -206,4 +265,3 @@ print(config_file_path)
 copy_data = colect_copy_data(config_file_path)
 #perform copy
 perform_copy(copy_data)
-

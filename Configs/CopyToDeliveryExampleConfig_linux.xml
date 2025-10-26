@@ -8,6 +8,15 @@
   </DeliveryPathSubDirs>
   <DeleteIfExist>yes</DeleteIfExist>
   <CreateIfNotExist>yes</CreateIfNotExist>
+  <ConditionsForContinue>
+    <ConditionItemPath path_type="relative">/CopyToDeliveryExampleSource/exampledata.txt</ConditionItemPath>
+  </ConditionsForContinue>
+  <ReplaceConst>
+    <ConstItem xml_const="#VARIANT" value="var456"/>
+  </ReplaceConst>
+  <ReadReplaceConst>
+    <ConstItem xml_const="#MODEL_EDITION_1" regex="ModelEdition1\s*=\s*(\S+)" path_type="relative">/CopyToDeliveryExampleSource/exampledata.txt</ConstItem>
+  </ReadReplaceConst>
 
   <CopySet>
    <!-- Known attributes: -->
@@ -63,8 +72,11 @@
       <WhatSourceItem path_type="absolute">/home/developer/PycharmProjects/pythonProject/CopyToDeliveryRepoGitHub/CopyToDeliveryExampleSource/b.txt</WhatSourceItem>
     </WhereTarget>
 
+    <!-- ************ Copy 1 specific file from specific path into root target folder Text Replace functionality -->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/subModels/#MODEL_EDITION_1/#VARIANT.txt</WhatSourceItem>
+    </WhereTarget>
+
  </CopySet>
 </MainNode>
-
-
-
