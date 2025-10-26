@@ -10,8 +10,8 @@
 #  Version  Date      Author  Comment                                                      *
 #  1.0 - Introduction (basic copy functions, ready for windows and linux systems)
 #  2.0 - Replace const
-# .PLAN
 #  3.0 - Add zip files
+# .PLAN
 #  4.0 - Log messages
 #*******************************************************************************************
 # Import
@@ -21,9 +21,9 @@ import re
 import shutil
 import glob
 import xml.etree.ElementTree as ET
-import string
 import stat
 import platform
+
 
 #***************************************************************************************************
 # Global Variables
@@ -148,6 +148,44 @@ def colect_copy_data(config_file_path):
             # data = data.replace("#SW_NAME#", "ABCD")
             data = data.replace(replace_item_const, replace_item_value)
 
+    # gain and test zip7z program path
+    zip_path_elem = copy_data["main_node"].find("PathToZip")
+    if (zip_path_elem is None):
+        zip_path = input("PathToZip was not found in config file. Please enter the PathToZip:")
+    else:
+        zip_path = zip_path_elem.text.strip()
+    if (zip_path_elem.get("path_type") == "relative"):
+        zip_path = os.path.normpath(script_start_dir + zip_path_elem.text.strip())
+    else:
+        zip_path = zip_path_elem.text.strip()
+    if (os.path.exists(zip_path)):
+        copy_data["zip_path"] = zip_path
+    else:
+        print("PathToZip does not exist. Script stoped")
+        exit()
+
+    # gain and test temp path
+    temp_path_elem = copy_data["main_node"].find("PathToTemp")
+    if (temp_path_elem is None):
+        temp_path = input("PathToTemp was not found in config file. Please enter the PathToTemp:")
+    else:
+        temp_path = temp_path_elem.text.strip()
+    if (temp_path_elem.get("path_type") == "relative"):
+        temp_path = os.path.normpath(script_start_dir + temp_path_elem.text.strip())
+    else:
+        temp_path = temp_path_elem.text.strip()
+    if (os.path.exists(temp_path)):
+        copy_data["temp_path"] = temp_path
+    else:
+        os.makedirs(temp_path)
+        if (os.path.exists(temp_path)):
+            copy_data["temp_path"] = temp_path
+            print("PathToTemp created")
+        else:
+            print("PathToTemp does not exist and it is not possible to create it")
+            exit()
+
+
     # parse xml data
     xml_obj = ET.fromstring(data)
     copy_data["main_node"] = xml_obj
@@ -199,8 +237,7 @@ def perform_copy(copy_data):
             if (os.path.exists(var_where)):
                 print(var_where)
             else:
-                print(var_where)
-                print("target path does not exist")
+                print("target path does not exist:", var_where)
         # loop through items in where element
         for item in where:
             var_what = item.text.strip()
@@ -210,38 +247,94 @@ def perform_copy(copy_data):
                         var_what = os.path.normpath(script_start_dir + item.text.strip())
                     else:
                         var_what = os.path.normpath(item.text.strip())
-            if os.path.isdir(var_what):
-                if (os.path.exists(var_where)):
-                    force_remove_readonly(var_where)
-                # copy all subdirs recursively
-                shutil.copytree(var_what, var_where)
+
+            zipfile_path_delivery = ""
+            # firt test of .zip at the end of the path. In that case it is normal file as each other
+            if not ((var_what[-4:] == ".zip") or (var_what[-5:] == ".zipx") or (var_what[-3:] == ".7z")):
+                # second test of .zip in the path. In that case zip needs to be unpacked
+                if ((".zip" in str(var_what)) or (".7z" in str(var_what))):
+
+                    # Prepare unzip_temp_path dir
+                    unzip_temp_path = copy_data["temp_path"]
+                    if (os.path.exists(unzip_temp_path)):
+                        force_remove_readonly(unzip_temp_path)
+                    os.makedirs(unzip_temp_path)
+
+                    zipapp_path = copy_data["zip_path"]
+
+                    if (".zipx" in str(var_what)):
+                        zipindex = var_what.index(".zipx")
+                        #var_what[:(zipindex)] takes characters from the beginning up to (but not including) zipindex
+                        zipfile_path = var_what[:(zipindex + 5)]
+                        # var_what[(zipindex):] takes characters from zipindex to the end
+                        zipfile_path_rest = var_what[(zipindex + 6):]
+                        if IS_WINDOWS:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-5] + "\\"
+                        if IS_LINUX:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[:-5] + "/"
+                    elif (".7z" in str(var_what)):
+                        zipindex = var_what.index(".7z")
+                        zipfile_path = var_what[:(zipindex + 3)]
+                        zipfile_path_rest = var_what[(zipindex + 4):]
+                        if IS_WINDOWS:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-3] + "\\"
+                        if IS_LINUX:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[:-3] + "/"
+                    else:
+                        zipindex = var_what.index(".zip")
+                        zipfile_path = var_what[:(zipindex + 4)]
+                        zipfile_path_rest = var_what[(zipindex + 5):]
+                        if IS_WINDOWS:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[2:-4] + "\\"
+                        if IS_LINUX:
+                            unzip_temp_path = copy_data["temp_path"] + zipfile_path[:-4] + "/"
+                    new_unziped_file_path = unzip_temp_path + zipfile_path_rest
+                    # print(zipfile_path)
+                    # print(new_unziped_file_path)
+                    if (not os.path.exists(unzip_temp_path)):
+                        if IS_WINDOWS:
+                            my_os_command = zipapp_path + " x " + zipfile_path + " -o" + unzip_temp_path + " -r"
+                            os.system(my_os_command)
+                        if IS_LINUX:
+                            my_os_command = zipapp_path + " x " + zipfile_path + " -o" + unzip_temp_path
+                            os.system(my_os_command)
+                    var_what = new_unziped_file_path
+
+            # pattern1 = '*.txt'
+            # matching_filenames_1 = glob.glob(pattern1)
+            # ['file1.txt', 'file2.txt', 'file3.txt']
+            matching_filenames = glob.glob(os.path.normpath(var_what))
+            if matching_filenames==[]:
+                print("Error source path does not exist: ", var_what)
             else:
-                # pattern1 = '*.txt'
-                # matching_filenames_1 = glob.glob(pattern1)
-                # ['file1.txt', 'file2.txt', 'file3.txt']
-                matching_filenames = glob.glob(os.path.normpath(var_what))
-                if matching_filenames==[]:
-                    print("Error source path does not exist: ", var_what)
-                else:
-                    for item_2 in matching_filenames:
-                        # shutil.copy2('src_file.txt', 'dest_file.txt')
-                        var_what = item_2
-                        print("WhatSourceItem: ", var_what)
-                        # shutil.copy2(var_what, var_where)
-                        if os.path.isdir(var_what):
-                            # copy all subdirs recursively
-                            var_where_sub = var_where + os.path.basename(item_2)
-                            shutil.copytree(var_what, var_where_sub)
-                            var_where_sub = ""
-                        else:
-                            if (not(where.get("copy_type") == "rename")):
-                                if (os.path.exists(var_what)):
-                                    os.makedirs(var_where, exist_ok=True)
-                                    shutil.copy2(var_what, var_where)
-                                else:
-                                    print("Error source path does not exist: ", var_what)
+                for item_2 in matching_filenames:
+                    # shutil.copy2('src_file.txt', 'dest_file.txt')
+                    var_what2 = item_2
+                    print("WhatSourceItem: ", var_what2)
+                    # shutil.copy2(var_what, var_where)
+                    if os.path.isdir(var_what2):
+                        # copy all subdirs recursively
+                        # remove asterix if exist
+                        if var_what[-1:] == "*":
+                            var_what = var_what[:-1]
+                        # path subraction final target path = delivery path + (longer - shorter)
+                        if IS_WINDOWS:
+                            var_where_sub = var_where + "\\" + item_2[len(var_what):]
+                        if IS_LINUX:
+                            var_where_sub = var_where + "/" + item_2[len(var_what):]
+                        if (os.path.exists(var_where_sub)):
+                            force_remove_readonly(var_where_sub)
+                        shutil.copytree(var_what2, var_where_sub)
+                        var_where_sub = ""
+                    else:
+                        if (not(where.get("copy_type") == "rename")):
+                            if (os.path.exists(var_what2)):
+                                os.makedirs(var_where, exist_ok=True)
+                                shutil.copy2(var_what2, var_where)
                             else:
-                                shutil.copy2(var_what, var_where)
+                                print("Error source path does not exist: ", var_what2)
+                        else:
+                            shutil.copy2(var_what2, var_where)
 
 # ***************************************************************************************************
 # Main
@@ -254,12 +347,12 @@ script_start_dir = os.getcwd()
 #defaul_config_file_path = os.path.join(current_folder, "Configs", "CopyToDeliveryExampleConfig_windows.xml")
 #defaul_config_file_path = ''.join([current_folder, "/Configs", "/CopyToDeliveryExampleConfig_linux.xml"])
 
-defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
-#defaul_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
+#default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_windows.xml")
+default_config_file_path = os.path.normpath(script_start_dir+"/Configs/CopyToDeliveryExampleConfig_linux.xml")
 
-config_file_path = input("Please enter path to xml config file ["+str(defaul_config_file_path)+"]:")
+config_file_path = input("Please enter path to xml config file ["+str(default_config_file_path)+"]:")
 if (config_file_path == ""):
-    config_file_path = defaul_config_file_path
+    config_file_path = default_config_file_path
 print(config_file_path)
 #collect and test input data
 copy_data = colect_copy_data(config_file_path)

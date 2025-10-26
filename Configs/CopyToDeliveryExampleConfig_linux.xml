@@ -6,6 +6,8 @@
     <DirItem name="/SubExampleA"/>
     <DirItem name="/SubExampleB"/>
   </DeliveryPathSubDirs>
+  <PathToZip path_type="relative">/7zip_linux_unpacked/7zz</PathToZip>
+  <PathToTemp path_type="relative">/_unzip</PathToTemp>
   <DeleteIfExist>yes</DeleteIfExist>
   <CreateIfNotExist>yes</CreateIfNotExist>
   <ConditionsForContinue>
@@ -78,5 +80,47 @@
       <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/subModels/#MODEL_EDITION_1/#VARIANT.txt</WhatSourceItem>
     </WhereTarget>
 
+    <!-- ************ Test copy whole zip file -->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/TestZip.zip</WhatSourceItem>
+    </WhereTarget>
+    <!-- ************ Copy 1 specific file from .7z path into root target folder-->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/Test7z.7z/sub7zA/sub7zA.txt</WhatSourceItem>
+    </WhereTarget>
+    <!-- ************ Copy 1 specific file from .zip path into root target folder-->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/TestZip.zip/subZipA/subZipA.txt</WhatSourceItem>
+    </WhereTarget>
+    <!-- ************ Copy 1 specific file from .zipx path into root target folder-->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/TestZipx.zipx/subZipxA/subZipxA.txt</WhatSourceItem>
+    </WhereTarget>
+    <!-- ************ Copy multiple files from .zipx path into root target folder-->
+    <WhereTarget  path_type="relative">
+      /
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/TestZipx.zipx/subZipxC/*</WhatSourceItem>
+    </WhereTarget>
+
+    <!-- ************ Test of recursive copy of whole folder packed in an .zipx file -->
+	<!-- ************ !!!!!!!  BUG  !!!!!!!!!! following item will remove all previous -->
+    <!-- <WhereTarget  path_type="relative"> -->
+    <!--   \ -->
+    <!--   <WhatSourceItem path_type="relative">\CopyToDeliveryExampleSource\TestZipx.zipx\subZipxC</WhatSourceItem> -->
+    <!-- </WhereTarget> -->
+
+	<!-- ************ Test of recursive copy of whole folder packed in an .zipx file -->
+    <WhereTarget  path_type="relative">
+      /TestZipx/subZipxB
+      <WhatSourceItem path_type="relative">/CopyToDeliveryExampleSource/TestZipx.zipx/subZipxB/*</WhatSourceItem>
+    </WhereTarget>
+
  </CopySet>
 </MainNode>
+
+
+
